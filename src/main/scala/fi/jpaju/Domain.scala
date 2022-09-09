@@ -14,3 +14,12 @@ case class Person(
     team: Team,
     city: City,
   )
+
+object Person:
+  def create(
+      age: Age,
+      name: PersonName,
+      team: Team,
+      city: City,
+    ): Person =
+    Person(UUID.randomUUID(), age, name, team, city)

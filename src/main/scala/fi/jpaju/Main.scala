@@ -2,28 +2,36 @@ package fi.jpaju
 
 import java.util.UUID
 
-def program =
+def testPerson(person: Person) =
+  val name = person.name
+  println(s"$name is adult: ${person ? PersonFilters.isAdult}")
+  println(s"$name plays in TPS: ${person ? PersonFilters.tpsPersonFilter}")
+  println(s"$name lives in city containing 'ina': ${person ? PersonFilters.livesInInaCity}")
+
+def program() =
   val name: PersonName = "name"
-  val city: City       = "Turku"
-  val team: Team       = "TPS"
 
-  val person = Person(UUID.randomUUID(), 20, name, team, city)
-
-  val personSelections = PersonSelections(
-    Selection.empty,
-    Selection.singleton(person.city),
-    Selection.singleton(person.team),
+  val person1 = Person.create(
+    age = 20,
+    name = "Good player",
+    team = "TPS",
+    city = "Kaarina",
   )
 
-  val filterFromSelections = PersonFilters.fromSelections(personSelections)
-  println(s"Passes person filter: ${person ? filterFromSelections}")
-  println(s"Passes age filter: ${person ? FilterExamples.adultFilter}")
-  println(s"Passes team filter: ${person ? FilterExamples.tpsPersonFilter}")
+  val person2 = Person.create(
+    age = 16,
+    name = "Average player",
+    team = "HPK",
+    city = "Forssa",
+  )
+
+  testPerson(person1)
+  testPerson(person2)
 
 end program
 
 @main
 def main =
   println(Console.CYAN)
-  program
+  program()
   println(Console.RESET)

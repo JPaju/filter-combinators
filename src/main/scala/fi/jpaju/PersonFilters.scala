@@ -1,15 +1,12 @@
 package fi.jpaju
 
-case class PersonSelections(
-    persons: Selection[Person],
-    cities: Selection[City],
-    teams: Selection[Team],
-  )
-
 object PersonFilters:
-  def fromSelections(selections: PersonSelections): Filter[Person] =
-    Filter.all(
-      selections.persons.toSelectionFilter,
-      selections.cities.toSelectionFilter.contramap(_.city),
-      selections.teams.toSelectionFilter.contramap(_.team),
-    )
+  val adultAgeRange: Range[Int] = Range.create(18, Int.MaxValue)
+  val isAdult: Filter[Person]   = adultAgeRange.toRangeFilter.contramap[Person](_.age)
+
+  val tpsTeamFilter: Filter[Team]     = Filter.fromEquals[Team]("TPS")
+  val tpsPersonFilter: Filter[Person] = tpsTeamFilter.contramap[Person](_.team)
+
+  val inaTerm: SearchTerm             = SearchTerm.fromTerm("ina")
+  val cityIncludesIna: Filter[String] = Filter.fromPredicate(inaTerm.isIncluded)
+  val livesInInaCity: Filter[Person]  = cityIncludesIna.contramap[Person](_.city)
