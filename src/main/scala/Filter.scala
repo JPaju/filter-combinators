@@ -17,33 +17,33 @@ end extension
 
 object Filter:
 
-  def always[A](b: Boolean): Filter[A] =
-    _ => b
-
-  def alwaysPass[A]: Filter[A] =
-    always(true)
-
-  def alwaysFail[A]: Filter[A] =
-    always(false)
-
-  def matches[A](a: A): Filter[A] =
-    _ == a
-
   def fromPredicate[A](predicate: A => Boolean): Filter[A] =
     predicate
 
+  def fromEquals[A](a: A): Filter[A] =
+    fromPredicate(_ == a)
+
   def fromSelection[A](s: Selection[A]): Filter[A] =
-    if s.isEmpty then Filter.alwaysPass
-    else s.isSelected(_)
+    if s.isEmpty then Filter.pass
+    else fromPredicate(s.isSelected(_))
+
+  def always[A](willPass: Boolean): Filter[A] =
+    fromPredicate(_ => willPass)
+
+  def pass[A]: Filter[A] =
+    always(true)
+
+  def fail[A]: Filter[A] =
+    always(false)
 
   def contraMap[A, B](f: B => A)(filter: Filter[A]): Filter[B] =
-    b => filter(f(b))
+    fromPredicate(b => filter(f(b)))
 
   def all[A](filters: Filter[A]*): Filter[A] =
-    filters.foldLeft(alwaysPass[A])(_ && _)
+    filters.foldLeft(pass)(_ && _)
 
   def any[A](filters: Filter[A]*): Filter[A] =
-    filters.foldLeft(alwaysFail[A])(_ || _)
+    filters.foldLeft(fail)(_ || _)
 
 // Filter syntax
 extension [A](a: A)
