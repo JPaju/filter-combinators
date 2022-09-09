@@ -1,3 +1,5 @@
+package fi.jpaju
+
 import java.util.*
 
 type PersonName = String

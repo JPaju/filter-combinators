@@ -1,3 +1,5 @@
+package fi.jpaju
+
 opaque type SearchTerm = String
 
 extension (searchTerm: SearchTerm)

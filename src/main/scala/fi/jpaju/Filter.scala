@@ -1,3 +1,5 @@
+package fi.jpaju
+
 opaque type Filter[A] = A => Boolean
 
 extension [A](self: Filter[A])
@@ -13,6 +15,9 @@ extension [A](self: Filter[A])
   def unary_! : Filter[A] =
     a => !self(a)
 
+  def contramap[B](f: B => A): Filter[B] =
+    b => self.passes(f(b))
+
 end extension
 
 object Filter:
@@ -23,10 +28,6 @@ object Filter:
   def fromEquals[A](a: A): Filter[A] =
     fromPredicate(_ == a)
 
-  def fromSelection[A](s: Selection[A]): Filter[A] =
-    if s.isEmpty then Filter.pass
-    else fromPredicate(s.isSelected(_))
-
   def always[A](willPass: Boolean): Filter[A] =
     fromPredicate(_ => willPass)
 
@@ -35,9 +36,6 @@ object Filter:
 
   def fail[A]: Filter[A] =
     always(false)
-
-  def contraMap[A, B](f: B => A)(filter: Filter[A]): Filter[B] =
-    fromPredicate(b => filter(f(b)))
 
   def all[A](filters: Filter[A]*): Filter[A] =
     filters.foldLeft(pass)(_ && _)
